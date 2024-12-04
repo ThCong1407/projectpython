@@ -1,0 +1,36 @@
+<!-- core/templates/core/user_search.html -->
+{% extends "base.html" %}
+
+{% block title %}User Search{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2>Thành viên của nhóm: {{ group.name }}</h2>
+        {% if members %}
+        <ul class="list-unstyled d-flex flex-wrap mt-4">
+            {% for member in members %}
+            <li class="member">
+                <a href="{% url 'profile_search_view' user.id %}">
+                    <img src="{{ member.user.profile.profile_picture.url }}" class="rounded-circle user-avatar" width="40" height="40" alt="{{ user.first_name }}'s Profile Picture">
+                </a>
+                <span>{{ member.user.first_name }} {{ member.user.last_name }}</span>
+        
+                {% if user == group.creator %}
+                    <a href="{% url 'remove_member' group.id member.id %}" class="btn btn-danger">Kich</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+        
+
+        </ul>
+    {% else %}
+        <p>Không có thành viên nào trong nhóm này.</p>
+    {% endif %}
+    
+    
+        
+        <a href="{% url 'list_groups' %}" class="btn btn-primary">Quay lại danh sách nhóm</a>
+    </div>
+  
+    {% endblock %}
+

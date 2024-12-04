@@ -1,0 +1,25 @@
+<!-- core/templates/core/blocked_friends_list.html -->
+{% extends "base.html" %}
+
+{% block title %}Blocked Friends{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Blocked Friends</h2>
+    {% if blocked_users %}
+        <ul>
+            {% for user in blocked_users %}
+                <li>
+                    {{ user.user.first_name }} {{ user.user.last_name }}
+                    <form method="post" action="{% url 'unblock_friend' user.user.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Unblock</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no blocked friends.</p>
+    {% endif %}
+</div>
+{% endblock %}

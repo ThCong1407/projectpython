@@ -1,0 +1,31 @@
+<li class="comment-item">
+    <div>
+        <strong class="comment-user">{{ comment.author.first_name }} {{ comment.author.last_name }}</strong> - <small class="text-muted comment-date">{{ comment.created_at|date:"H:i, d/m/Y" }}</small>
+        <p class="comment-content">{{ comment.content }}</p>
+
+        <!-- Like Button -->
+        <button class="btn btn-sm btn-outline-primary btn-like" onclick="toggleCommentLike({{ comment.id }})">
+            Like <span id="comment-like-count-{{ comment.id }}">{{ comment.like_count }}</span>
+        </button>
+        {% if comment.user == request.user %}
+            <a href="{% url 'edit_comment' comment.id %}" class="btn btn-sm btn-link">Edit</a>
+            <a href="{% url 'delete_comment' comment.id %}" class="btn btn-sm btn-link text-danger">Delete</a>
+        {% endif %}
+        <!-- Reply Button -->
+        <!-- Reply Form (Initially Hidden) -->
+        <form method="post" action="{% url 'add_comment_reply' post.id comment.id %}" class="d-flex align-items-center mt-2" id="reply-form-{{ comment.id }}" style="display: none;">
+            {% csrf_token %}
+            <input type="text" name="{{ form.content.name }}" id="{{ form.content.id_for_label }}-reply" value="" class="custom-input form-control me-2" placeholder="Write a reply...">
+            <button type="submit" class="btn btn-sm btn-outline-primary">Reply</button>
+        </form>
+    </div>
+
+    <!-- Recursively Render Replies -->
+    {% if comment.replies.all %}
+        <ul class="comment-list">
+            {% for reply in comment.replies.all %}
+                {% include "core/comment_item.html" with comment=reply post=post %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>

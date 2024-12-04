@@ -1,0 +1,56 @@
+<!-- core/templates/core/friend_requests.html -->
+{% extends "base.html" %}
+{% block title %}Friend Requests{% endblock %}
+{% block content %}
+<style>
+    .friend-requests-container {
+        margin-top: 50px;
+    }
+    .friend-requests-container h2 {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .friend-requests-container ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    .friend-requests-container li {
+        background-color: #f9f9f9;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+    }
+    .friend-requests-container a {
+        color: #007bff;
+        text-decoration: none;
+        margin-left: 10px;
+    }
+    .friend-requests-container a:hover {
+        text-decoration: underline;
+    }
+    .friend-avatar {
+        margin-right: 10px;
+        border-radius: 50%;
+    }
+</style>
+<div class="friend-requests-container mt-5">
+    <h2>Friend Requests</h2>
+    <ul>
+        {% for request in requests %}
+            <li>
+                {% if request.sender.profile.profile_picture %}
+                    <img src="{{ request.sender.profile.profile_picture.url }}" class="friend-avatar" width="40" height="40" alt="{{ request.sender.first_name }}'s Profile Picture">
+                {% else %}
+                    <img src="https://via.placeholder.com/40" class="friend-avatar" width="40" height="40" alt="Default Profile Picture">
+                {% endif %}
+                {{ request.sender.username }}
+                <a href="{% url 'accept_friend_request' request.id %}">Accept</a>
+                <a href="{% url 'delete_friend_request' request.id %}">Decline</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

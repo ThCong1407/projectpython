@@ -1,0 +1,58 @@
+<!-- core/templates/core/friends_list.html -->
+{% extends "base.html" %}
+{% block title %}Your Friends{% endblock %}
+{% block content %}
+<style>
+    .friends-container {
+        margin-top: 50px;
+    }
+    .friends-container h2 {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .friends-container ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    .friends-container li {
+        background-color: #f9f9f9;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+    }
+    .friends-container a {
+        color: #007bff;
+        text-decoration: none;
+        margin-left: auto; /* Push the link to the right */
+    }
+    .friends-container a:hover {
+        text-decoration: underline;
+    }
+    .friend-avatar {
+        margin-right: 10px;
+        border-radius: 50%;
+    }
+</style>
+<div class="friends-container mt-5">
+    <h2>Your Friends</h2>
+    <ul>
+        {% for friend in friends %}
+            <li>
+                {% if friend.profile.profile_picture %}
+                    <img src="{{ friend.profile.profile_picture.url }}" class="friend-avatar" width="40" height="40" alt="{{ friend.first_name }}'s Profile Picture">
+                {% else %}
+                    <img src="https://via.placeholder.com/40" class="friend-avatar" width="40" height="40" alt="Default Profile Picture">
+                {% endif %}
+                {{ friend.first_name }} {{ friend.last_name }}
+                <a href="{% url 'block_friend' friend.id %}">Block</a>
+                <a href="{% url 'remove_friend' friend.id %}">Remove Friend</a>
+            </li>
+        {% empty %}
+            <p>You have no friends yet.</p>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

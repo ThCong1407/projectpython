@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Social Media{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'feed' %}">MySocial</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Search Form in Navbar -->
+            <form class="form-inline mx-auto" method="get" action="{% url 'user_search' %}">
+                <input class="form-control mr-sm-2" type="search" name="query" placeholder="Search Friend" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+            <!-- Friends Button -->
+            <li class="nav-item d-flex align-items-center dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="friendsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-user-friends"></i> Friends
+                </a>
+                <div class="dropdown-menu" aria-labelledby="friendsDropdown">
+                    <a class="dropdown-item" href="{% url 'friends_list' %}">All Friends</a>
+                    <a class="dropdown-item" href="{% url 'non_friends' %}">People You May Know</a>
+                    <a class="dropdown-item" href="{% url 'friend_requests' %}">Your Friend Request</a>
+                    <a class="dropdown-item" href="{% url 'list_blocked_friends' %}">All Friend Blocked</a>
+                </div>
+            </li>
+            <li class="nav-item d-flex align-items-center dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="groupDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-users"></i> Groups
+                </a>
+                <div class="dropdown-menu" aria-labelledby="groupDropdown">
+                    <a class="dropdown-item" href="{% url 'create_group' %}">Create Group</a>
+                    <a class="dropdown-item" href="{% url 'list_groups' %}">List All Groups</a>
+                    {% comment %} <a class="dropdown-item" href="{% url 'manage_members' user.id %}">Manage My Groups</a> {% endcomment %}
+                </div>
+            </li>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link d-flex align-items-center" href="{% url 'profile_view' %}">
+                            <span>{{ user.first_name }} {{ user.last_name }}</span>
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}" class="rounded-circle ml-2" width="30" height="30" alt="Profile Picture">
+                            {% else %}
+                                <img src="https://via.placeholder.com/30" class="rounded-circle ml-2" width="30" height="30" alt="Default Profile Picture">
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link" href="{% url 'create_post' %}">New post</a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        {% block content %}{% endblock %}
+    </div>
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

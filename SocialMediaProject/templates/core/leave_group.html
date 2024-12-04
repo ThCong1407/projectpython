@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Leave Group{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Leave Group</h2>
+    <p>Are you sure you want to leave the group "{{ group.name }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Leave Group</button>
+        <a href="{% url 'group_detail' group.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

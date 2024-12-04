@@ -1,0 +1,95 @@
+<!-- core/templates/core/profile_edit.html -->
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Social Media{% endblock %}
+
+{% block content %}
+<style>
+    /* Consistent styling for form groups */
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+    }
+
+    /* Style for labels */
+    label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    /* Style for input fields */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="file"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 1em;
+    }
+
+    /* Error message styling */
+    .text-danger {
+        font-size: 0.9em;
+        color: red;
+        margin-top: 5px;
+    }
+
+    /* Button styling */
+    .btn-block, .btn-success, .btn-warning {
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="text-center">Edit Profile</h2>
+            
+            <div class="card mt-4">
+                <!-- Form for updating profile details -->
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- User form fields (first name, last name) -->
+                        {% for field in u_form %}
+                            <div class="form-group">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        
+                        <!-- Profile form fields (bio) -->
+                        {% for field in p_form %}
+                            <div class="form-group">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="form-group text-center mt-4">
+                            <button type="submit" class="btn btn-success">Save Changes</button>
+                            <a href="{% url 'profile_view' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

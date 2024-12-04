@@ -1,0 +1,26 @@
+<!-- core/templates/core/edit_comment.html -->
+{% extends "base.html" %}
+
+{% block title %}Edit Comment{% endblock %}
+
+{% block content %}
+
+<style>
+    .custom-input {
+        border-radius: 20px;
+        padding: 10px 15px;
+        border: 1px solid #ccc;
+        width: 100%;
+        max-width: 400px;  /* Optional max-width to limit the input size */
+        transition: border-color 0.3s ease-in-out;
+    }
+</style>
+<div class="container mt-5">
+    <h2>Edit Your Comment</h2>
+    <form method="post" class="d-flex align-items-center mb-3">
+        {% csrf_token %}
+        <input type="text" name="{{ form.content.name }}" id="{{ form.content.id_for_label }}" value="{{ form.content.value|default_if_none:'' }}" class="custom-input form-control me-2" placeholder="Add your comment...">
+        <button type="submit" class="btn btn-sm btn-outline-primary">Add Comment</button>
+    </form>
+</div>
+{% endblock %}

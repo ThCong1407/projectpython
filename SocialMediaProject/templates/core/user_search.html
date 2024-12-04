@@ -1,0 +1,74 @@
+<!-- core/templates/core/user_search.html -->
+{% extends "base.html" %}
+
+{% block title %}User Search{% endblock %}
+
+{% block content %}
+<style>
+    .user-avatar {
+        margin-right: 10px;
+        border-radius: 50%;
+    }
+    .button-group {
+        display: flex;
+        gap: 10px;
+    }
+</style>
+<div class="container mt-5">
+
+    <!-- Search results -->
+    {% if query %}
+        <h4 class="mt-4">Results for "{{ query }}":</h4>
+        <ul class="list-group mt-3">
+            {% for user in results %}
+                <li class="list-group-item d-flex align-items-center">
+                    <!-- Profile Picture on the left -->
+                    {% if user.profile.profile_picture %}
+                        <img src="{{ user.profile.profile_picture.url }}" class="rounded-circle user-avatar" width="40" height="40" alt="{{ user.first_name }}'s Profile Picture">
+                    {% else %}
+                        <!-- Fallback to default icon if no profile picture -->
+                        <img src="https://via.placeholder.com/40" class="rounded-circle user-avatar" width="40" height="40" alt="Default Profile Picture">
+                    {% endif %}
+
+                    <!-- User's name and profile link -->
+                    <div class="d-flex justify-content-between w-100 align-items-center">
+                        <span>{{ user.first_name }} {{ user.last_name }}</span>
+                        <div class="button-group">
+                            {% if request.user.is_authenticated %}
+                                {% if not user in request.user.profile.friends.all %}
+                                    <form method="post" action="{% url 'send_friend_request' user.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-primary btn-sm">Add Friend</button>
+                                    </form>
+                                {% endif %}
+                                <a href="{% url 'block_friend' user.id %}" class="btn btn-sm btn-outline-danger">Block</a>
+                                
+                                <!-- Follow/Unfollow buttons -->
+                                {% if user != request.user %}
+                                    {% if user.profile in request.user.profile.following.all %}
+                                        <form method="post" action="{% url 'unfollow_user' user.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Unfollow</button>
+                                        </form>
+                                    {% else %}
+                                        <form method="post" action="{% url 'follow_user' user.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-primary btn-sm">Follow</button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+
+                                <a href="{% url 'profile_search_view' user.id %}" class="btn btn-secondary btn-sm">View Profile</a>
+                            {% else %}
+                                <span class="text-muted">Log in to view profile</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="list-group-item">No users found matching "{{ query }}".</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}

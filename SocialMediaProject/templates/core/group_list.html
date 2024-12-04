@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Groups details{% endblock %}
+
+{% block content %}
+<style>
+    .group-card {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+    }
+    .group-info {
+        margin-bottom: 10px;
+    }
+    .group-info h5 {
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+    .group-info p {
+        font-size: 1rem;
+        color: #555;
+    }
+    .join-button {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+    .join-button:hover {
+        background-color: #0056b3;
+    }
+    .no-groups-message {
+        text-align: center;
+        font-size: 1.25rem;
+        color: #777;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="header-container d-flex justify-content-between align-items-center">
+        <h2 class="text-center">Nhóm gợi ý dành cho bạn</h2>
+        <a href="{% url 'create_group' %}" class="btn btn-success create-group-button">Tạo nhóm</a>
+    </div>
+
+    <div class="row">
+        {% for group in groups %}
+            <div class="col-md-12">
+                <div class="group-card">
+                    <div class="group-info">
+                        <h5 class="mb-1">
+                            <a href="{% url 'group_detail' group.id %}" class="text-decoration-none">{{ group.name }}</a>
+                        </h5>
+                        <p class="mb-1">Số thành viên: {{ group.members.count }} thành viên</p>
+                    </div>
+                    {% if user != group.admin %}
+                    <a href="{% url 'toggle_membership' group.id %}" class="join-button">
+                        {% if user in group.members.all %}
+                            Hủy tham gia
+                        {% else %}
+                            Tham gia
+                        {% endif %}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p class="no-groups-message">Không có nhóm nào hiện tại.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

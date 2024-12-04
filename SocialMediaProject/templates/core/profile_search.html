@@ -1,0 +1,134 @@
+<!-- core/templates/core/profile_search.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ searched_user.first_name }} {{ searched_user.last_name }}'s Profile{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Cover photo styling */
+    .cover-photo {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    /* Profile picture container positioned over cover photo */
+    .profile-picture-container {
+        position: absolute;
+        bottom: -40px;
+        left: 15%; /* Center profile picture */
+        transform: translateX(-50%);
+        width: 100px;
+        height: 100px;
+    }
+
+    /* Profile picture styling */
+    .profile-picture {
+        width: 100%;
+        height: 100%;
+        border: 3px solid white;
+    }
+
+    /* Left Column (Posts Section) */
+    .posts-section {
+        max-height: 600px; /* Fixed height to enable scrolling */
+        overflow-y: auto;
+        padding-right: 15px; /* Prevents overlap with scrollbar */
+    }
+
+    /* Right column spacing */
+    .profile-info {
+        margin-top: 40px; /* Lowers the profile section */
+    }
+
+    .add-friend-btn {
+        background: none;
+        border: none;
+        color: #007bff;
+        cursor: pointer;
+    }
+    .add-friend-btn:hover {
+        color: #0056b3;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row">
+        <!-- Left Column: Searched User's Posts with Scroll -->
+        <div class="col-md-8 posts-section">
+            <h3>{{ searched_user.first_name }}'s Posts</h3>
+            {% for post in posts %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5>{{ post.title }}</h5>
+                        <p class="text-muted">Published on {{ post.created_at|date:"H:i, d/m/Y" }}</p>
+                        <p>{{ post.content }}</p>
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" class="img-fluid mt-2" alt="Post Image">
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-muted">{{ searched_user.first_name }} hasn't posted anything yet.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Right Column: Profile Information of Searched User -->
+        <div class="col-md-4 profile-info">
+            <div class="card">
+                <!-- Cover Photo -->
+                <div class="card-header p-0 position-relative">
+                    {% if searched_user.profile.cover_photo %}
+                        <img src="{{ searched_user.profile.cover_photo.url }}" class="img-fluid cover-photo" alt="Cover Photo">
+                    {% else %}
+                        <img src="https://via.placeholder.com/600x200" class="img-fluid cover-photo" alt="Default Cover Photo">
+                    {% endif %}
+                    
+                    <!-- Profile Picture -->
+                    <div class="profile-picture-container">
+                        {% if searched_user.profile.profile_picture %}
+                            <img src="{{ searched_user.profile.profile_picture.url }}" class="rounded-circle profile-picture" alt="Profile Picture">
+                        {% else %}
+                            <img src="https://via.placeholder.com/100" class="rounded-circle profile-picture" alt="Default Profile Picture">
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Searched User Information -->
+                <div class="card-body text-center">
+                    <h4 class="full-name">{{ searched_user.first_name }} {{ searched_user.last_name }}
+                        {% if request.user.is_authenticated and not searched_user in request.user.profile.friends.all %}
+                            <form method="post" action="{% url 'send_friend_request' searched_user.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="add-friend-btn"><i class="fas fa-user-plus"></i></button>
+                            </form>
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Friends:</strong> {{ num_friends }}</p>
+                    <p><strong>Followers:</strong> {{ num_followers }}</p>
+                    <p><strong>Following:</strong> {{ num_following }}</p>
+                    {% if searched_user != request.user %}
+                        {% if searched_user.profile in request.user.profile.following.all %}
+                            <form method="post" action="{% url 'unfollow_user' searched_user.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">Unfollow</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'follow_user' searched_user.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-primary">Follow</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                    <p>Status: {{ searched_user.profile.status }}</p>
+                    <p class="text-muted">Bio: {{ searched_user.profile.bio }}</p>
+                    <p class="text-muted">{{ searched_user.email }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Comment{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Create Comment on Post {{ post.id }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Create Comment</button>
+    </form>
+</div>
+{% endblock %}

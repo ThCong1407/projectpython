@@ -1,0 +1,64 @@
+<!-- core/templates/core/non_friends.html -->
+{% extends "base.html" %}
+{% block title %}People You May Know{% endblock %}
+{% block content %}
+<style>
+    .non-friends-container {
+        margin-top: 50px;
+    }
+    .non-friends-container h2 {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .non-friends-container ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    .non-friends-container li {
+        background-color: #f9f9f9;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+    }
+    .non-friends-container .btn {
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        text-decoration: none;
+        margin-left: auto; /* Push the button to the right */
+    }
+    .non-friends-container .btn:hover {
+        background-color: #0056b3;
+    }
+    .non-friends-avatar {
+        margin-right: 10px;
+        border-radius: 50%;
+    }
+</style>
+<div class="non-friends-container mt-5">
+    <h2>People You May Know</h2>
+    <ul class="list-unstyled">
+        {% for user in non_friends %}
+            <li class="mb-3">
+                {% if user.profile.profile_picture %}
+                    <img src="{{ user.profile.profile_picture.url }}" class="non-friends-avatar" width="40" height="40" alt="{{ user.first_name }}'s Profile Picture">
+                {% else %}
+                    <img src="https://via.placeholder.com/40" class="non-friends-avatar" width="40" height="40" alt="Default Profile Picture">
+                {% endif %}
+                <strong>{{ user.first_name|default:"Unknown" }} {{ user.last_name|default:"User" }}</strong>
+                <a href="{% url 'send_friend_request' user.id %}" class="btn btn-sm btn-primary ml-2" onclick="alert('Friend request sent to {{ user.username }}!');">
+                    Add Friend
+                </a>
+                <a href="{% url 'block_friend' user.id %}" class="btn btn-sm btn-outline-danger">Block</a>
+            </li>
+        {% empty %}
+            <p>No new people to suggest right now. Check back later!</p>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

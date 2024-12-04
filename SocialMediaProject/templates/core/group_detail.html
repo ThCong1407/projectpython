@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ group.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .post-card {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+    }
+    .post-content {
+        margin-bottom: 10px;
+    }
+    .post-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+    .post-caption {
+        font-size: 1rem;
+        color: #555;
+    }
+    .post-image {
+        width: 800px;
+        height: 400px;
+        margin-top: 10px;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="header">
+        <h2>{{ group.name }}</h2>
+        <p>{{ group.description }}</p>
+    </div>
+
+    {% if user == group.creator %}
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'create_group_post' group.id %}" class="btn btn-primary mr-2">
+            Create Post in {{ group.name }}
+        </a>
+        <a href="{% url 'manage_requests' group.id %}" class="btn btn-secondary mr-2">Manage Requests</a>
+        <button class="btn btn-danger mr-2" data-toggle="modal" data-target="#deleteGroupModal">Delete Group</button>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#updateGroupModal">Update Group</button>
+    </div>
+    {% endif %}
+
+    <a href="{% url 'view_group_members' group.id %}" class="btn btn-info mb-3">View All Members</a>
+    {% if can_post %}
+    <a href="{% url 'create_group_post' group.id %}" class="btn btn-primary mb-3">
+        Create Post in {{ group.name }}
+    </a>
+    {% if user in group.members.all %}
+    <a href="{% url 'leave_group' group.id %}" class="btn btn-danger mb-3">Leave Group</a>
+    {% endif %}
+    {% else %}
+    <p>You do not have permission to post in this group.</p>
+    {% endif %}
+
+    <!-- Modal Delete -->
+    <div class="modal fade" id="deleteGroupModal" tabindex="-1" role="dialog" aria-labelledby="deleteGroupModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteGroupModalLabel">Confirm Delete Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this group? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <form method="post" action="{% url 'delete_group' group.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Update -->
+    <div class="modal fade" id="updateGroupModal" tabindex="-1" role="dialog" aria-labelledby="updateGroupModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateGroupModalLabel">Update Group Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'update_group' group.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="groupName">Group Name</label>
+                            <input type="text" class="form-control" id="groupName" name="name" value="{{ group.name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="groupDescription">Group Description</label>
+                            <textarea class="form-control" id="groupDescription" name="description" rows="3" required>{{ group.description }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mt-5">Group Posts</h3>
+    <div class="row">
+        {% if posts %}
+            {% for post in posts %}
+                    <div class="post-card">
+                        <div class="post-content">
+                            <h5 class="post-title">{{ post.author.first_name }} {{ post.author.last_name }}</h5>
+                            <p class="post-caption">{{ post.content|truncatewords:10 }}</p>
+                            {% if post.image %}
+                                <img src="{{ post.image.url }}" alt="Post by {{ post.author.username }}" class="post-image">
+                            {% endif %}
+                            <!-- Link to post detail page -->
+                            <!-- Like button -->
+                            <form method="post" action="{% url 'toggle_like_group_post' post.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">
+                                    {% if post.is_liked %}
+                                        Unlike
+                                    {% else %}
+                                        Like
+                                    {% endif %}
+                                </button>
+                                <span>{{ post.like_count }} likes</span>
+                            </form>
+                            <a href="{% url 'group_post_detail' post.id %}"> View more</a>
+                        </div>
+                    </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center">No posts from members.</p>
+        {% endif %}
+</div>
+{% endblock %}

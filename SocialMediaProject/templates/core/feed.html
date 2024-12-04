@@ -1,0 +1,109 @@
+<!-- core/templates/core/feed.html -->
+{% extends "base.html" %}
+
+{% block title %}Home - Feed{% endblock %}
+
+{% block content %}
+<style>
+    .feed-container {
+        margin-top: 20px;
+    }
+    .post-card {
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .post-author-avatar {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        margin-right: 10px;
+    }
+    .post-author-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .post-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .post-content {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    .post-image {
+        width: 800px;
+        height: 400px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+    .like-button {
+        margin-top: 10px;
+    }
+    .comment-count {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #555;
+    }
+    .view-post-link {
+        margin-top: 10px;
+    }
+</style>
+
+<div class="container feed-container">
+    <h2 class="mb-4">New Posts</h2>
+    {% for post in posts %}
+        <div class="card post-card">
+            <div class="card-body">
+                <div class="post-author-info">
+                    <!-- Assuming author has a profile picture; use default if not -->
+                    {% if post.author.profile.profile_picture %}
+                        <img src="{{ post.author.profile.profile_picture.url }}" alt="{{ post.author.username }}'s avatar" class="rounded-circle post-author-avatar">
+                    {% else %}
+                        <img src="/static/default-avatar.png" alt="Default avatar" class="rounded-circle post-author-avatar">
+                    {% endif %}
+                    <h4 class="mb-0">{{ post.author.first_name }} {{ post.author.last_name }}</h4>
+                </div>
+                <p class="text-muted mb-3">Published on {{ post.created_at|date:"H:i, d/m/Y" }}</p>
+                <h5 class="post-title">{{ post.title }}</h5>
+                <p class="post-content">{{ post.content }}</p>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" class="img-fluid post-image" alt="Post Image">
+                {% endif %}
+                
+                <!-- Like button and count -->
+                
+                
+                <!-- Comment count -->
+                <p class="comment-count">{{ post.comment_count }} comments</p>
+
+                <!-- Link to post detail page -->
+                <button class="btn btn-sm btn-outline-primary like-button" onclick="toggleLike({{ post.id }})" id="like-btn-{{ post.id }}">
+                    Like <span id="like-count-{{ post.id }}">{{ post.like_count }}</span>
+                </button>
+                <a href="{% url 'post_detail' post.id %}" class="btn btn-sm btn-link view-post-link">View Post</a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- JavaScript for Like Button -->
+<script>
+function toggleLike(postId) {
+    fetch(`/post/toggle-like/${postId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById(`like-count-${postId}`).textContent = data.like_count;
+        document.getElementById(`like-btn-${postId}`).classList.toggle('btn-primary', data.liked);
+        document.getElementById(`like-btn-${postId}`).classList.toggle('btn-outline-primary', !data.liked);
+    });
+}
+</script>
+{% endblock %}

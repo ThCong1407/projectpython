@@ -1,0 +1,49 @@
+<!-- core/templates/core/user_search.html -->
+{% extends "base.html" %}
+
+{% block title %}User Search{% endblock %}
+
+{% block content %}
+    
+    <div class="container mt-4">
+        <div class="header">
+            <h2>Quản lý Yêu cầu Tham gia - {{ group.name }}</h2>
+        </div>
+        
+        {% if requests %}
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Thành viên</th>
+                        <th>Ngày yêu cầu</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in requests %}
+                        <tr>
+                            <td>{{ request.user.username }}</td>
+                            <td>{{ request.joined_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <form action="{% url 'approve_request' request.id 'approve' %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-approve">Chấp nhận</button>
+                                </form>
+                                <form action="{% url 'approve_request' request.id 'deny'%}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-deny" onclick="return confirm('Bạn có chắc muốn xóa yêu cầu này?');">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-center">Không có yêu cầu tham gia nào.</p>
+        {% endif %}
+        
+        <a href="{% url 'list_groups' %}" class="back-link btn btn-info">Quay lại danh sách nhóm</a>
+    </div>
+
+    {% endblock %}
+
